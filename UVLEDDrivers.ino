@@ -3,9 +3,9 @@
 
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
-#define BOT_BUFFER_SIZE   60
-#define BOT_START_DELIM   '<'
-#define BOT_END_DELIM     '>'
+#define UVLED_BUFFER_SIZE   60
+#define UVLED_START_DELIM   '<'
+#define UVLED_END_DELIM     '>'
 boolean debug = false;
 int ledArray[16];
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
@@ -13,7 +13,7 @@ typedef struct {
   unsigned char head;
   unsigned char tail;
   boolean active;
-  char buffer[BOT_BUFFER_SIZE];
+  char buffer[UVLED_BUFFER_SIZE];
 } 
 
 
@@ -39,7 +39,7 @@ void loop(){
   if (Serial.available()) {
     char c = (char)Serial.read();
     //   Serial1.write(c);
-    lrfd_buffer_add(c);  
+    uvled_buffer_add(c);  
   }
 
 
@@ -50,16 +50,16 @@ void loop(){
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-void lrfd_buffer_add(char c)
+void uvled_buffer_add(char c)
 {
-  if(c == BOT_START_DELIM)
+  if(c == UVLED_START_DELIM)
   {
     //Serial.println("start");
     b.head = 0;
     b.tail = 0;
     b.active = true;
   }
-  else if(c == BOT_END_DELIM)
+  else if(c == UVLED_END_DELIM)
   {
     //Serial.println("end");
     if(b.active == false)
@@ -68,7 +68,7 @@ void lrfd_buffer_add(char c)
     }
     else
     {
-      lrfd_buffer_check();
+      uvled_buffer_check();
       b.active = false;
     }
   }
@@ -76,7 +76,7 @@ void lrfd_buffer_add(char c)
   {
     if(b.active)
     {
-      if(b.tail < BOT_BUFFER_SIZE) 
+      if(b.tail < UVLED_BUFFER_SIZE) 
       {
         b.buffer[b.tail] = c;
         b.tail++;
@@ -92,7 +92,7 @@ void lrfd_buffer_add(char c)
 
 
 
-void lrfd_buffer_check(void)
+void uvled_buffer_check(void)
 {
   unsigned char msgIdx = 0;
   unsigned char idx = 0;
